@@ -1,0 +1,42 @@
+{
+    "topologies":
+    [
+        {
+            "name": "Constln1",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "IoT",
+                    "iname": "IoTBasic",
+                    "nodeid": 1,
+                    "loglevel": "info",
+                    "additionalargs": "",
+                    "latitude": 0.1,
+                    "longitude": 0.9,
+                    "elevation": 0.0, 
+                    "models": [
+                        {
+                            "iname": "ModelDataGenerator",
+                            "data_poisson_lambda": 5,
+                            "data_size": 2048,
+                            "queue_size": 3000
+                        }
+                    ]
+                    
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2022-11-14 12:00:00",
+        "endtime": "2022-11-14 12:01:00",
+        "delta": 1
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd",
+        "logfolder": ""
+    }
+}

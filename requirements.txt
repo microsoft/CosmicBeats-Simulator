@@ -1,0 +1,8 @@
+astropy==5.3.1
+dask==2023.7.1
+geopy==2.3.0
+gradio==3.39.0
+numpy==1.25.1
+pandas==2.0.3
+plotly==5.15.0
+skyfield==1.46

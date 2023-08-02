@@ -1,0 +1,43 @@
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+strategy:
+  matrix:
+    ubuntumachine:
+      python.version: '3.11'
+      vmImage: ubuntu-latest
+    windowsmachine:
+      python.version: '3.11'
+      vmImage: windows-latest
+
+pool:
+  vmImage: $(vmImage)
+  
+
+steps:
+- task: ComponentGovernanceComponentDetection@0
+  inputs:
+    scanType: 'Register'
+    verbosity: 'Verbose'
+    alertWarningLevel: 'High'
+- task: CodeQL3000Init@0
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- script: |
+    pip install pytest pytest-azurepipelines
+  displayName: 'Install pytest azure pipelines'
+
+- script: |
+    pytest -Wignore src/test/
+  displayName: 'Test all components'
+

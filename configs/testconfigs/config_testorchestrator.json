@@ -1,0 +1,79 @@
+{
+    "topologies":
+    [
+        {
+            "name": "Constln1",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "all",
+                    "tle_1": "1 50985U 22002B   22290.71715197  .00032099  00000+0  13424-2 0  9994",
+                    "tle_2": "2 50985  97.4784 357.5505 0011839 353.6613   6.4472 15.23462773 42039",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        },
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 10
+                        }
+                    ]
+                    
+                },
+                {
+                    
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 2,
+                    "loglevel": "all",
+                    "tle_1": "1 52750U 22057U   22307.12792818  .00032886  00000+0  16217-2 0  9992",
+                    "tle_2": "2 52750  97.5321  60.4918 0010549  43.5060 316.7004 15.17803350 24430",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+
+                        },
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 10
+                        }
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 3,
+                    "loglevel": "all",
+                    "latitude": 49.3,
+                    "longitude": -122.2,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 10
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2022-11-14 12:00:00",
+        "endtime": "2022-11-14 12:10:00",
+        "delta": 5.0
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd",
+        "logfolder": ""
+    }
+}

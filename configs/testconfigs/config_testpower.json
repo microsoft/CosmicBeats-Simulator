@@ -1,0 +1,59 @@
+{
+    "topologies":
+    [
+        {
+            "name": "Constln1",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "all",
+                    "tle_1": "1 50985U 22002B   22290.71715197  .00032099  00000+0  13424-2 0  9994",
+                    "tle_2": "2 50985  97.4784 357.5505 0011839 353.6613   6.4472 15.23462773 42039",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        },
+                        {
+                            "iname": "ModelPower",
+                            "power_consumption": {
+                                "TXRADIO": 0.532,
+                                "HEATER": 0.532,
+                                "RXRADIO": 0.133,
+                                "CONCENTRATOR": 0.266,
+                                "GPS": 0.190
+                            },
+                            "power_configurations": {
+                                "MAX_CAPACITY": 25308,
+                                "MIN_CAPACITY": 15185,
+                                "INITIAL_CAPACITY": 25308 
+                            },
+                            "power_generations":{
+                                "SOLAR": 1.666667
+                            },
+                            "always_on": ["GPS", "CONCENTRATOR", "RXRADIO", "HEATER"],
+                            "efficiency": 0.85,
+                            "delta": 5
+                        }
+                        
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2022-11-14 12:00:00",
+        "endtime": "2022-11-14 14:00:00",
+        "delta": 5.0
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd",
+        "logfolder": ""
+    }
+}

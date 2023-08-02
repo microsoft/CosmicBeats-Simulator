@@ -1,0 +1,102 @@
+{
+    "topologies":
+    [
+        {
+            "name": "LORACONSTELLATION",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelFixedOrbit",
+                            "lat": 0.0,
+                            "lon": -0.0,
+                            "alt": 637e3,
+                            "sunlit": true
+                        },
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 0
+                        },
+                        {
+                            "iname": "ModelLoraRadio",
+                            "self_ctrl": false,
+                            "radio_physetup":{
+                                "_frequency": 0.138e9,
+                                "_bandwidth": 30e3,
+                                "_sf": 11,
+                                "_coding_rate": 5,
+                                "_preamble": 8,
+                                "_tx_power": 1.76,
+                                "_tx_antenna_gain": 2.18,
+                                "_tx_line_loss": 1,
+                                "_rx_antenna_gain": -2.18,
+                                "_rx_line_loss": 1,
+                                "_gain_to_temperature": -30.1,
+                                "_bits_allowed": 2
+                            }
+                        }
+                    ]
+                    
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 2,
+                    "loglevel": "info",
+                    "latitude": 0.0,
+                    "longitude": -0.0,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 0
+                        },
+                        {
+                            "iname": "ModelLoraRadio",
+                            "self_ctrl": false,
+                            "radio_physetup":{
+                                "_frequency": 0.149e9,
+                                "_bandwidth": 30e3,
+                                "_sf": 11,
+                                "_coding_rate": 5,
+                                "_preamble": 8,
+                                "_tx_power": 1.76,
+                                "_tx_antenna_gain": 2.84,
+                                "_tx_line_loss": 1,
+                                "_rx_antenna_gain": -3.49,
+                                "_rx_line_loss": 1,
+                                "_gain_to_temperature": -30.1,
+                                "_bits_allowed": 2
+                            }
+                        },
+                        {
+                            "iname": "ModelDataStore",
+                            "queue_size": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2023-04-07 18:29:00", 
+        "endtime": "2023-04-07 18:40:00",
+        "delta": 1
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd"
+    }
+}

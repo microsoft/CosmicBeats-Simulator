@@ -1,0 +1,143 @@
+{
+    "topologies":
+    [
+        {
+            "name": "ImagingSatConstellation",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 0,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "starttime": "2023-04-07 17:29:00", 
+                    "endtime": "2023-04-07 17:40:00",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelFixedOrbit",
+                            "lat": 0.0,
+                            "lon": -0.0,
+                            "alt": 1407e3,
+                            "sunlit": true
+                        },
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 0
+                        },
+                        {
+                            "iname": "ModelImagingRadio",
+                            "self_ctrl": false,
+                            "radio_physetup":{
+                                "_frequency": 8.09e9,
+                                "_symbol_rate": 76.8e6,
+                                "_bandwidth": 96e6,
+                                "_tx_power": -4.8,
+                                "_tx_antenna_gain": 15,
+                                "_tx_line_loss": 2,
+                                "_rx_antenna_gain": 49,
+                                "_rx_line_loss": 1.8,
+                                "_gain_to_temperature": 29,
+                                "_num_channels": 6,
+                                "_atmosphere_loss": 1.5
+                            }
+                        }
+                    ]
+                    
+                },
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "starttime": "2023-04-07 17:29:00", 
+                    "endtime": "2023-04-07 17:40:00",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelFixedOrbit",
+                            "lat": 0.0,
+                            "lon": -0.0,
+                            "alt": 1408e3,
+                            "sunlit": true
+                        },
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 0
+                        },
+                        {
+                            "iname": "ModelImagingRadio",
+                            "self_ctrl": false,
+                            "radio_physetup":{
+                                "_frequency": 8.09e9,
+                                "_symbol_rate": 76.8e6,
+                                "_bandwidth": 96e6,
+                                "_tx_power": -4.8,
+                                "_tx_antenna_gain": 15,
+                                "_tx_line_loss": 2,
+                                "_rx_antenna_gain": 49,
+                                "_rx_line_loss": 1.8,
+                                "_gain_to_temperature": 29,
+                                "_num_channels": 6,
+                                "_atmosphere_loss": 1.5
+                            }
+                        }
+                    ]
+                    
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 2,
+                    "loglevel": "info",
+                    "latitude": 0.0,
+                    "longitude": -0.0,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelHelperFoV",
+                            "min_elevation": 0
+                        },
+                        {
+                            "iname": "ModelImagingRadio",
+                            "self_ctrl": false,
+                            "radio_physetup":{
+                                "_frequency": 8.09e9,
+                                "_bandwidth": 96e6,
+                                "_symbol_rate": 76.8e6,
+                                "_tx_power": -4.8,
+                                "_tx_antenna_gain": 15,
+                                "_tx_line_loss": 2,
+                                "_rx_antenna_gain": 49,
+                                "_rx_line_loss": 1.8,
+                                "_gain_to_temperature": 29,
+                                "_num_channels": 6
+                            }
+                        },
+                        {
+                            "iname": "ModelDataStore",
+                            "queue_size": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2023-04-07 18:29:00", 
+        "endtime": "2023-04-07 18:40:00",
+        "delta": 1
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd"
+    }
+}

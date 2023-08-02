@@ -1,0 +1,209 @@
+{
+    "topologies":
+    [
+        {
+            "name": "Constellation1",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "all",
+                    "tle_1": "1 50985U 22002B   22290.71715197  .00032099  00000+0  13424-2 0  9994",
+                    "tle_2": "2 50985  97.4784 357.5505 0011839 353.6613   6.4472 15.23462773 42039",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        }
+                    ]
+                    
+                },
+                {
+                    
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 2,
+                    "loglevel": "all",
+                    "tle_1": "1 52750U 22057U   22307.12792818  .00032886  00000+0  16217-2 0  9992",
+                    "tle_2": "2 52750  97.5321  60.4918 0010549  43.5060 316.7004 15.17803350 24430",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        }
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 3,
+                    "loglevel": "all",
+                    "latitude": 49.3,
+                    "longitude": -122.2,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 4,
+                    "loglevel": "all",
+                    "latitude": 67.206709,
+                    "longitude": -136.927826,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 5,
+                    "loglevel": "all",
+                    "latitude": 56.173869,
+                    "longitude": -106.693451,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 6,
+                    "loglevel": "all",
+                    "latitude": 62.784696,
+                    "longitude": 51.216712,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 7,
+                    "loglevel": "all",
+                    "latitude": 43.754923,
+                    "longitude": 57.544837,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 8,
+                    "loglevel": "all",
+                    "latitude": 25.065319,
+                    "longitude": 18.169837,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 9,
+                    "loglevel": "all",
+                    "latitude": 61.160706,
+                    "longitude": 114.087799,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 10,
+                    "loglevel": "all",
+                    "latitude": 69.331104,
+                    "longitude": 144.146392,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 11,
+                    "loglevel": "all",
+                    "latitude": 77.064844,
+                    "longitude": -42.443398,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 12,
+                    "loglevel": "all",
+                    "latitude": 38.728339,
+                    "longitude": -96.466832,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 13,
+                    "loglevel": "all",
+                    "latitude": -13.528564,
+                    "longitude": -65.880895,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                },
+                {
+                    
+                    "type": "GS",
+                    "iname": "GSBasic",
+                    "nodeid": 14,
+                    "loglevel": "all",
+                    "latitude": -21.892127,
+                    "longitude": 132.576138,
+                    "elevation": 0.0,
+                    "additionalargs": "",
+                    "models":[
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2022-11-14 12:00:00",
+        "endtime": "2022-11-14 12:10:00",
+        "delta": 5.0
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd",
+        "logfolder": ""
+    }
+}

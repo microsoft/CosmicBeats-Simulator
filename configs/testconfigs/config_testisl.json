@@ -1,0 +1,95 @@
+{
+    "topologies":
+    [
+        {
+            "name": "ImagingSatConstellation",
+            "id": 0,
+            "nodes":
+            [
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 1,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        },
+                        {
+                            "iname": "ModelISL",
+                            "connected_nodeIDs": [2,3],
+                            "radio_physetup": {
+                                "datarate": 1e6,
+                                "MTU": 1500,
+                                "BER": 1e-6,
+                                "_bits_allowed": 2
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 2,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"                       
+                        },
+                        {
+                            "iname": "ModelISL",
+                            "connected_nodeIDs": [1,3],
+                            "radio_physetup": {
+                                "datarate": 1e6,
+                                "MTU": 1500,
+                                "BER": 1e-6,
+                                "_bits_allowed": 2
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "SAT",
+                    "iname": "SatelliteBasic",
+                    "nodeid": 3,
+                    "loglevel": "info",
+                    "tle_1": "1 52750U 22057U   23097.30444441  .00093670  00000+0  27574-2 0  9991", 
+                    "tle_2": "2 52750  97.5350 216.3378 0010863 230.3166 129.7119 15.34639252 48067",
+                    "additionalargs": "",
+                    "models":[
+                        {
+                            "iname": "ModelOrbit"
+                        },
+                        {
+                            "iname": "ModelISL",
+                            "connected_nodeIDs": [1,2],
+                            "radio_physetup": {
+                                "datarate": 1e6,
+                                "MTU": 1500,
+                                "BER": 1e-6,
+                                "_bits_allowed": 2
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "simtime":
+    {
+        "starttime": "2023-04-07 18:30:00", 
+        "endtime": "2023-04-07 18:40:00",
+        "delta": 60
+    },
+    "simlogsetup":
+    {
+        "loghandler": "LoggerCmd",
+        "logfolder": ""
+    }
+}

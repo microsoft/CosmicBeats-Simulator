@@ -1,0 +1,4 @@
+# Unit test
+We use the [*unittest*](https://docs.python.org/3/library/unittest.html) framework provided by Python. The recommend practice is writing a dedicated unit test class in a module for each newly implemented node, model, and any other significant class. The test class incorporates the corresponding test cases. You can find some example test classes [here](/src/test/). If you need a specific *config* file for your test class setup, please add the same under [test config folder](/configs/testconfigs/) having the test class name in the file name.
+
+Once your test class is ready, you can create a test suite for it in the [*runtests.py*](/runtests.py) file. The test suite may include multiple relevant test modules. The objective here is having single point for running all the unit tests and customize the test environment. One can just run the [*runtests.py*](/runtests.py) to validate that things are not broken.
