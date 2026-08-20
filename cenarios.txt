@@ -1,0 +1,25 @@
+1. Monitoramento de Desastres (Urgência vs. Volume):
+
+Cenário: Sensores IoT na Amazônia detectam um foco de incêndio.
+
+Desafio: O sensor envia 100 fotos. Enviar tudo para a Terra demora 10 minutos (lento demais).
+
+Solução MEC: O satélite processa as fotos, confirma o fogo e envia apenas um alerta de 1KB para a Terra em 5 segundos.
+
+Dificuldade para o Scheduler: Priorizar essa tarefa crítica acima de tarefas de rotina (ex: atualização de software de um trator).
+
+2. Agricultura de Precisão (Gargalo de Energia):
+
+Cenário: Um enxame de drones sobre uma plantação envia dados hiperespectrais para a constelação.
+
+Desafio: Os satélites estão passando pela "zona de eclipse" (sombra da Terra), onde não geram energia solar e dependem da bateria.
+
+Dificuldade para o Scheduler: O algoritmo não pode apenas olhar para a CPU livre. Ele tem que prever: "Se eu mandar essa tarefa pesada para o Satélite A agora, a bateria dele vai acabar antes de ele sair da sombra". O LLM é ótimo para ponderar múltiplas variáveis assim.
+
+3. Federação de Aprendizado (Privacidade):
+
+Cenário: Navios militares enviam dados de radar.
+
+Desafio: Os dados não podem ser enviados para uma estação terrestre em território estrangeiro. Devem ser processados lá em cima.
+
+Dificuldade para o Scheduler: Restrições geográficas e de segurança. O scheduler deve saber onde o satélite está sobrevoando antes de alocar a tarefa.

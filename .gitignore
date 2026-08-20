@@ -172,4 +172,4 @@ cython_debug/
 .history/
 
 # Built Visual Studio Code Extensions
-*.vsix
+*.vsix.DS_Store

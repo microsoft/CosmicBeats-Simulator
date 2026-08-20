@@ -2,31 +2,48 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 '''
-from src.sim.simulator import Simulator
 import sys
 import time
 import random
+import os
+import argparse  # <-- A biblioteca mágica para terminais
+from src.sim.simulator import Simulator
 
 if __name__ == "__main__":
-    random.seed(0)
-    _filepath = ''
+    # Semente fixa: Garante que os mesmos eventos acontecem para TODOS os motores
+    random.seed(0) 
+    
+    # =================================================================
+    # CONFIGURAÇÃO DO TERMINAL (CLI)
+    # =================================================================
+    parser = argparse.ArgumentParser(description="CosmicBeats - Simulador NTN-MEC")
+    
+    # Argumento 1: O Motor (com opções restritas para evitar erros de digitação)
+    parser.add_argument('--engine', type=str, default="LLM", 
+                        choices=["LLM", "BASELINE", "SLM", "DRL"], 
+                        help="Escolha o cérebro: LLM, BASELINE, SLM, ou DRL")
+    
+    # Argumento 2: O arquivo de configuração JSON
+    parser.add_argument('--config', type=str, default="configs/config.json", 
+                        help="Caminho para o arquivo config.json")
+    
+    args = parser.parse_args()
 
-    #look for the config file path in the command line arguments
+    # =================================================================
+    # INJEÇÃO DA CHAVE SELETORA
+    # =================================================================
+    os.environ["MEC_ENGINE"] = args.engine
+    
+    print("\n" + "="*50)
+    print(f"🚀 INICIANDO COSMICBEATS")
+    print(f"🧠 Motor Cognitivo : {args.engine}")
+    print(f"📂 Arquivo Config  : {args.config}")
+    print("="*50 + "\n")
 
-    if(len(sys.argv) > 1):
-        _filepath = sys.argv[1]
-    else:
-        _filepath = "configs/config.json"
-
-    _sim = Simulator(_filepath)
+    _sim = Simulator(args.config)
 
     _startTime = time.perf_counter()
-
-    # Now, let's start the simulation
-
     _sim.execute()
-
     _endTime = time.perf_counter()
 
-    print(f"[Simulator Info] Time required to run the simulation: {_endTime-_startTime} seconds.")
- 
+    print(f"\n[Simulator Info] Tempo real de execução: {_endTime-_startTime:.4f} segundos.")

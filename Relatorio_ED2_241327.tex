@@ -1,0 +1,793 @@
+\documentclass[conference,comsoc,twoside,caption=false]{IEEEtran}
+\usepackage{newtxtext,newtxmath}
+\ifCLASSOPTIONcompsoc
+  \usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
+\else
+  \usepackage[caption=false,font=footnotesize,labelfont=small]{subfig}
+\fi
+\captionsetup[figure]{font=footnotesize}
+\ifCLASSOPTIONcaptionsoff
+  \usepackage[nomarkers]{endfloat}
+  \let\MYoriglatexcaption\caption
+  \renewcommand{\caption}[2][\relax]{\MYoriglatexcaption[#2]{#2}}
+\fi
+\usepackage[utf8]{inputenc}
+\usepackage{ragged2e}
+\usepackage{graphicx}
+\usepackage{tabulary}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\let\openbox\relax
+\usepackage{amsmath}
+\usepackage{amsthm}
+\let\Bbbk\relax
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\interdisplaylinepenalty=2500
+\usepackage[noadjust]{cite}
+\usepackage{balance}
+\usepackage{tabularx}
+\usepackage{comment}
+\usepackage{setspace}
+\usepackage{xspace}
+\usepackage{acronym}
+\usepackage{multirow}
+\usepackage{upgreek}
+\usepackage{nicefrac}
+\usepackage{ifthen}
+\usepackage[bookmarks=false]{hyperref}
+\hypersetup{draft}
+\usepackage{caption}
+\usepackage{cleveref}
+\usepackage[inline]{enumitem}
+\usepackage{makecell}
+\usepackage{siunitx}
+\usepackage{placeins}
+\renewcommand{\baselinestretch}{0.877}
+\theoremstyle{definition}
+\newtheorem{exmp}{Example}
+\DeclareMathOperator{\Expectation}{\mathbb{E}\xspace}
+\DeclareMathOperator{\Probability}{\mathbb{P}\xspace}
+\usepackage[table]{xcolor}
+\usepackage{flushend}
+
+\acrodef{NTN}{Non-Terrestrial Network}
+\acrodef{MEC}{Multi-Access Edge Computing}
+\acrodef{LEO}{Low Earth Orbit}
+\acrodef{DRL}{Deep Reinforcement Learning}
+\acrodef{LLM}{Large Language Model}
+\acrodef{SLM}{Small Language Model}
+\acrodef{SoC}{State of Charge}
+\acrodef{ISL}{Inter-Satellite Link}
+\acrodef{IoT}{Internet of Things}
+\acrodef{KPI}{Key Performance Indicator}
+
+\hyphenation{al-go-rithm allows op-tical net-works semi-conduc-tor ubi-quitous
+energy expe-riments satel-lite con-stel-lation orches-tration se-mantic
+com-pliance}
+
+\begin{document}
+\author{
+\IEEEauthorblockN{Octávio B. Nascimento and Carlos A. Astudillo}
+\IEEEauthorblockA{%
+Institute of Computing, State University of Campinas (UNICAMP),
+Campinas, SP, 13083-852, Brazil\\
+Emails: o241327@dac.unicamp.br, castudillo@unicamp.br\\
+Code: \url{https://github.com/wocn-unicamp/CosmicBeats-Simulator}}
+}
+\title{\huge Semantic Task Orchestration in LEO-NTN\\
+Multi-Access Edge Computing:
+A Comparative Study}
+\maketitle
+    \newcommand{\MYheader}{\smash{\scriptsize
+    \hfil\parbox[t][\height][t]{\textwidth}{\centering {}}\hfil\hbox{}}}
+    \makeatletter
+    \def\ps@IEEEtitlepagestyle{%
+    \def\@oddhead{\MYheader}%
+    \def\@evenhead{\MYheader}%
+    \def\@oddfoot{}%
+    \def\@evenfoot{}}
+    \makeatother
+    \pagestyle{headings}
+    \addtolength{\footskip}{0\baselineskip}
+    \addtolength{\textheight}{-0.1\baselineskip}
+\begin{abstract}
+\ac{NTN} \ac{MEC} over \ac{LEO} constellations introduces extreme constraints
+on task orchestration: tight energy budgets driven by orbital eclipses,
+millisecond-range decision windows, and heterogeneous computing payloads.
+Beyond classical resource management, real-world tasks increasingly carry
+\emph{semantic constraints}---data sovereignty laws, privacy regulations,
+hardware-failure protocols---that pure numerical optimizers cannot interpret.
+This work presents a controlled comparative simulation of four orchestration
+paradigms over the same 1{,}200-second scenario and identical 69-task workload:
+(i)~a greedy heuristic baseline, (ii)~a \ac{DRL} agent (SB3 DQN,
+50{,}000~training episodes), (iii)~a \ac{SLM} simulating on-device NPU
+inference (Gemma~4 26B, \SI{50}{\milli\second} benchmark latency), and
+(iv)~a \ac{LLM} cloud orchestrator (Gemini~3.1 Flash~Lite). Results show that
+the LLM achieves 100\% semantic and anomaly compliance---versus 25\% for the
+heuristic baseline---at a cost of 5{,}000$\times$ higher energy per decision,
+empirically quantifying the compliance-vs-efficiency trade-off for NTN-MEC
+system designers.
+\end{abstract}
+\begin{IEEEkeywords}
+NTN-MEC, LEO satellite edge computing, deep reinforcement learning,
+large language models, semantic compliance, task orchestration.
+\end{IEEEkeywords}
+\acresetall
+\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+\label{sec:intro}
+
+The proliferation of \ac{LEO} constellations has positioned satellite nodes
+as candidates for \ac{MEC} infrastructure. When a constellation acts as a
+compute fabric, each satellite must independently decide, in real time, whether
+to accept an incoming processing task, redirect it to a peer via \ac{ISL}, or
+discard it---all subject to strict battery and memory constraints imposed by the
+orbital eclipse cycle~\cite{guo2024,gpp2022}.
+
+Beyond classical resource constraints, an emerging class of tasks carries
+semantic constraints derived from real-world regulations: data privacy laws
+(e.g., GDPR), national data sovereignty requirements, or hardware-level failure
+protocols. A compliant orchestrator must parse these constraints from natural
+language descriptions and map them onto routing decisions---a capability that
+pure numerical optimizers fundamentally lack.
+
+\ac{DRL}, and in particular the value-based Deep Q-Network (DQN) family
+introduced by Mnih \emph{et al.}~\cite{mnih2015}, has been applied to satellite
+MEC scheduling with promising results. Jiang \emph{et al.}~\cite{jiang2025}
+propose a multi-agent DRL framework for on-orbit task scheduling, reporting
+improvements of up to 70\% in completion time and 68\% in energy consumption
+over unoptimized baselines. Closer to our setting, Casas \emph{et al.}~\cite{casas2026}
+address DDQN-based routing in \ac{LEO} constellations and show that agent
+performance hinges critically on the reward function, whose design remains a
+manual, expertise-intensive process---so much so that they automate it with an
+LLM-in-the-loop framework, underscoring the practical cost of reward
+engineering. While computationally efficient, such DRL agents operate as
+black-boxes over numerical feature vectors, making them unable to interpret
+task-level semantic rules without explicit feature engineering.
+
+\acp{LLM} have recently been explored for resource allocation in wireless
+systems. Lee and Park~\cite{lee2024} demonstrate that LLMs can perform resource
+allocation in wireless networks and explicitly propose a hybrid architecture---a
+lightweight DNN for routine decisions combined with an LLM for complex semantic
+cases---to compensate for LLM latency limitations, directly motivating the
+DRL-vs-LLM trade-off this paper quantifies empirically. Abgaryan
+\emph{et al.}~\cite{abgaryan2024} show that LLMs match specialised RL/GNN
+approaches in job-shop scheduling benchmarks, confirming that LLM scheduling
+capability is not merely a surface-level linguistic effect. The concept of
+Edge Intelligence~\cite{deng2020} further motivates embedding compact language
+models directly on edge nodes, blurring the boundary between \emph{AI for the
+edge} and \emph{AI at the edge}.
+
+For real LEO constellations, Shenoy \emph{et al.}~\cite{shenoy2024} demonstrate
+with the CosMAC system that topology-aware scheduling for \ac{IoT} picosat
+constellations achieves up to 6.5$\times$ throughput improvement over standard
+MAC approaches, confirming that context-sensitive scheduling decisions have
+measurable operational impact beyond simulation.
+
+\textbf{Identified gap:} the literature treats DRL, LLM, and Edge Intelligence
+as separate threads, each optimising a single numerical metric (time, energy,
+throughput). No prior work directly compares all four paradigms---fixed
+heuristic, DRL, embedded \ac{SLM}, and centralized LLM---in the same simulated
+environment with primary focus on \emph{semantic compliance} rather than
+throughput alone. This paper fills that gap with the following contributions:
+\begin{enumerate}
+  \item A multi-engine comparative simulation framework (4 paradigms,
+    deterministic 1{,}200-second window, 69 identical tasks) enabling fair
+    paradigm comparison under identical orbital conditions.
+  \item A DRL agent trained with SB3 DQN across 50{,}000 synthetic episodes
+    using hidden-anomaly reward shaping, achieving 37.5\% anomaly compliance
+    without observing semantic rule types---the theoretical maximum for
+    binary-flag observations.
+  \item Empirical quantification of the compliance-vs-efficiency trade-off:
+    LLM achieves 100\% semantic and anomaly compliance at 5{,}000$\times$
+    higher energy cost per decision than the heuristic baseline.
+  \item An explicit parameter provenance audit (Table~\ref{tab:params})
+    distinguishing literature-grounded premises from deliberate design choices.
+\end{enumerate}
+
+\section{System Model}
+\label{sec:sysmodel}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\columnwidth]{architecure-diagram.png}
+\caption{NTN-MEC orchestration architecture. Three regional \ac{LEO}-\ac{MEC}
+nodes (Brazil, Europe, USA) receive a Poisson stream of tasks, each carrying a
+region, a RAM requirement, and an optional semantic annotation. A pluggable
+orchestration engine---BASELINE, DRL, SLM, or LLM---observes the real-time
+satellite state (battery \ac{SoC}, free RAM, solar phase) and maps every task
+onto one of four routing actions (SAT-1, SAT-2, SAT-15, or DROP) subject to
+battery, memory, and semantic constraints.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Network Architecture}
+Fig.~\ref{fig:architecture} depicts the overall orchestration architecture.
+A constellation of three \ac{LEO} satellites operates as \ac{MEC} nodes, each
+assigned to a fixed geographic region (Brazil, Europe, USA). Satellites carry
+heterogeneous computational payloads: 4{,}096~MB RAM each, with battery
+capacities of 75~Wh (SAT-1/Brazil), 50~Wh (SAT-2/Europe), and 100~Wh
+(SAT-15/USA). The \ac{ISL} is assumed always available (a common assumption for
+constellations with optical ISL), so drops reflect exclusively battery/RAM
+exhaustion or semantic rule violations---never link failure.
+
+\subsection{Task Arrival and Semantic Anomalies}
+Task arrivals follow a Poisson process with rate $\lambda = 4$~tasks/min, the
+standard model for aggregated \ac{IoT}/NTN traffic~\cite{guo2024}. Each task
+requires 500~MB of RAM held for 60~seconds. A fraction $\alpha = 10\%$ of tasks
+carry one of three semantic constraints, assigned uniformly at random:
+(i)~\emph{GDPR compliance} (must route exclusively to EUROPE, or discard);
+(ii)~\emph{data sovereignty} (must route exclusively to BRAZIL);
+(iii)~\emph{critical hardware failure} (must discard regardless of resources).
+These three rules constitute the ground-truth reference used to measure
+compliance.
+
+\subsection{Battery and Eclipse Model}
+Battery dynamics follow a physical orbital eclipse model: solar irradiance
+varies sinusoidally with orbital period $T = 90$~min---within the typical LEO
+range~\cite{guo2024,gpp2022}---as
+$\mathrm{solar}(t) = \sin\!\bigl(2\pi(t+\phi_i)/5{,}400\bigr)$,
+where $\phi_i$ is the orbital phase offset of satellite $i$. When
+$\mathrm{solar}(t) \le -0.10$ the satellite enters eclipse: battery drains at
+a housekeeping rate; otherwise it recharges. This threshold implies
+$\approx\!53\%$ eclipse per orbit (46~min), deliberately above the typical
+literature range of $\approx$35~min per revolution~\cite{sumanth2019}. The
+higher fraction was chosen as a pessimistic stress scenario to generate
+observable battery pressure within the 20-minute simulation window. Satellites
+refuse new tasks when battery \ac{SoC} falls below 20\% (design choice).
+
+Table~\ref{tab:params} lists all simulation parameters with explicit provenance.
+
+\begin{table}[!t]
+\centering
+\caption{Simulation Parameters and Provenance}
+\label{tab:params}
+\footnotesize
+\begin{tabular}{p{2.2cm}p{1.5cm}p{3.9cm}}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Source / Rationale} \\
+\midrule
+Orbital period   & 90 min           & Typical LEO range \cite{guo2024,gpp2022} \\
+Eclipse fraction & $\approx$53\%    & Above typical $\approx$35 min \cite{sumanth2019}; pessimistic stress scenario \\
+Battery threshold & 20\% SoC        & Design choice \\
+Battery capacities & 75/50/100 Wh  & Design choice (heterogeneous HW) \\
+SLM latency (NPU) & \SI{50}{\milli\second} & Order-of-magnitude from on-device benchmarks \cite{wang2025} \\
+Task arrival     & Poisson, $\lambda$\,=\,4/min & Standard NTN/IoT model \cite{guo2024}; rate is design choice \\
+RAM (total / task) & 4{,}096 / 500 MB & Design choice \\
+Task hold time   & 60 s             & Design choice \\
+Anomaly rate     & 10\%             & Design choice ($\approx$8 anomaly tasks in 69) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Orchestration Engines}
+\label{sec:engines}
+
+The four engines share a common interface: at each task arrival the engine
+receives the task descriptor (region, RAM requirement, semantic annotation if
+any) and the real-time satellite states (battery \ac{SoC}, free RAM, solar
+phase) and returns one of four actions: route to SAT-1, SAT-2, SAT-15, or DROP.
+
+\subsection{BASELINE (Greedy Heuristic)}
+The BASELINE filters candidate satellites by: (1)~region compatibility,
+(2)~battery \ac{SoC} $>$ 20\%, and (3)~available RAM $\geq$ required. Among
+eligible nodes it selects the highest-battery satellite, breaking ties by
+available RAM. The engine executes as a sequence of conditional checks with
+negligible latency and has no access to semantic annotations.
+
+\subsection{DRL (SB3 DQN): Problem Formulation}
+\label{sec:drl}
+
+We formulate the orchestration decision as a Markov Decision Process (MDP)
+$\mathcal{M} = \langle \mathcal{S}, \mathcal{A}, P, R, \gamma \rangle$, following
+the problem-formulation methodology of Casas \emph{et al.}~\cite{casas2026} for
+RL-based routing in \ac{LEO} constellations, where $\mathcal{S}$ is the state
+space, $\mathcal{A}$ the action space, $P$ the (unknown) transition kernel, $R$
+the reward function, and $\gamma$ the discount factor. Unlike the multi-hop
+packet-forwarding MDP of~\cite{casas2026,jiang2025}, our agent solves a
+\emph{single-step admission-and-routing} decision: each task arrival is an
+independent episode that terminates immediately after one action ($\gamma = 0$,
+a contextual-bandit degenerate MDP). This reflects the operational reality that
+the orbital dynamics (battery, eclipse) evolve on a timescale decoupled from the
+instantaneous per-task decision, so no intra-episode temporal credit assignment
+is required. The agent is \emph{model-free}: it never accesses $P$ nor the
+analytic battery/anomaly dynamics of Section~\ref{sec:sysmodel}, learning the
+policy purely from sampled transitions.
+
+\subsubsection*{State space $\mathcal{S}$}
+Each state $s \in [0,1]^{13}$ concatenates a 3-D one-hot encoding of the task
+region, a binary anomaly-present flag $h$, and per-satellite triplets for the
+three nodes:
+\begin{equation}
+s = \bigl[\,\underbrace{r_{\mathrm{US}}, r_{\mathrm{BR}}, r_{\mathrm{EU}}}_{\text{region}},\;
+      h,\;
+      \{\underbrace{b_i, m_i, c_i}_{\text{sat } i}\}_{i=1}^{3}\,\bigr],
+\label{eq:state}
+\end{equation}
+where $b_i$ is battery \ac{SoC}$/100$, $m_i$ free-RAM fraction $/4096$, and
+$c_i \in \{0,1\}$ the solar-charging indicator. Crucially, the state exposes
+only the \emph{presence} of an anomaly ($h$), never its \emph{type}. This is a
+deliberate scientific invariant: the agent cannot distinguish a GDPR rule from a
+data-sovereignty rule from a hardware failure, which structurally upper-bounds
+its achievable anomaly compliance (Section~\ref{sec:results}).
+
+\subsubsection*{Action space $\mathcal{A}$}
+The action space is discrete with four options,
+$\mathcal{A} = \{0,1,2,3\}$, mapping to \{route to SAT-1, route to SAT-2, route
+to SAT-15, DROP\}. At inference, the selected action is re-validated against the
+live fleet (region match, \ac{SoC}~$>$~20\%, sufficient RAM); an infeasible
+choice degrades to DROP, guaranteeing the policy never emits a physically
+impossible allocation.
+
+\subsubsection*{Reward function $R(s,a)$}
+The reward encodes both resource feasibility and semantic correctness:
+\begin{equation}
+R(s,a) =
+\begin{cases}
++1 + 0.1\,b_a & \text{valid route to eligible sat } a,\\
++1 & \text{DROP on a hardware-failure task},\\
+-0.5 & \text{forced DROP (no valid candidate)},\\
+-1 & \text{voluntary DROP while a candidate exists},\\
+-2 & \text{invalid action (region/\ac{SoC}/RAM fail)},
+\end{cases}
+\label{eq:reward}
+\end{equation}
+where $b_a$ is the chosen satellite's \ac{SoC} fraction, so the $+0.1\,b_a$ term
+breaks ties toward higher-charged nodes. Because reward design in dynamic
+\ac{LEO} settings is itself a hard, expertise-intensive problem---to the point
+that recent work automates it with LLMs~\cite{casas2026}---we apply
+\emph{reward shaping}: during training only, the hidden anomaly subtype selects
+the compliant target region (GDPR$\rightarrow$EUROPE, sovereignty$\rightarrow$BRAZIL)
+or mandates a drop (hardware). This is shaping, not information leakage: the
+subtype conditions the \emph{reward} but is never part of the observation in
+Eq.~\eqref{eq:state}, so at inference the agent must commit to the single best
+``blind'' fallback for $h=1$.
+
+\subsubsection*{Dynamics and assumptions}
+Training states are drawn i.i.d.: task region uniform over the three regions,
+anomaly present with probability $\alpha = 0.10$ (subtype uniform over the three
+rules), per-satellite battery $\sim\mathcal{U}(15,100)\%$, free
+RAM~$\sim\mathcal{U}(0,4096)$~MB, and solar charging Bernoulli$(0.5)$; task RAM
+is fixed at 500~MB. This distribution is designed to cover the operating region
+visited by the real SimPy simulation while keeping episodes independent.
+
+\subsubsection*{Algorithm and training}
+We use a Deep Q-Network (DQN)~\cite{mnih2015}---a value-based, off-policy,
+model-free method---implemented in Stable Baselines3 (SB3). DQN approximates the
+action-value $Q(s,a;\theta)$ with a two-layer MLP ($64\times64$) and minimizes
+the temporal-difference error toward the bootstrapped target
+\begin{equation}
+y = r + \gamma \max_{a'} Q(s',a';\theta^{-}),
+\label{eq:bellman}
+\end{equation}
+with target network parameters $\theta^{-}$~\cite{sutton2018,mnih2015}. Since
+$\gamma = 0$ in our single-step MDP, Eq.~\eqref{eq:bellman} reduces to
+$y = r$, and learning amounts to regressing the immediate reward of
+Eq.~\eqref{eq:reward}. The agent is trained for 50{,}000 timesteps with an
+$\varepsilon$-greedy schedule and periodic deterministic evaluation
+(Table~\ref{tab:dqn}); the best-performing checkpoint is retained. Because SB3
+cannot be wired directly into a SimPy discrete-event loop, training and
+inference are separated, with the trained model performing deterministic
+inference at $\approx$0.475~ms per call. A practical pitfall: \texttt{DQN.load()}
+in SB3 silently resets the global Python \texttt{random} seed, corrupting the
+deterministic task sequence shared across engines; this was resolved by
+restoring the canonical seed immediately after loading.
+
+\begin{table}[!t]
+\centering
+\caption{DQN Agent Hyperparameters (\texttt{NTNMECEnv})}
+\label{tab:dqn}
+\footnotesize
+\begin{tabular}{p{4.3cm}p{3.3cm}}
+\toprule
+\textbf{Hyperparameter} & \textbf{Value} \\
+\midrule
+Policy network        & MLP, $[64, 64]$ \\
+Learning rate         & $10^{-3}$ \\
+Replay buffer size    & 20{,}000 \\
+Batch size            & 128 \\
+Discount factor $\gamma$ & 0 (single-step MDP) \\
+Target update $\tau$  & 1.0 (hard) \\
+Target update interval & 500 steps \\
+Train frequency       & every 4 steps \\
+Exploration fraction  & 0.30 \\
+Final $\varepsilon$   & 0.05 \\
+Training timesteps    & 50{,}000 \\
+Eval.\ protocol       & 500 deterministic ep.\ / 5{,}000 steps \\
+Random seed           & 42 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Semantic Modeling via Prompting}
+\label{sec:prompting}
+The SLM and LLM engines replace the numerical feature vector of the DRL agent
+with a natural-language prompt, casting orchestration as an instruction-following
+task. Fig.~\ref{fig:prompt} shows the full prompt: a role/context header, the
+task descriptor (region, RAM, and the raw semantic annotation), the live fleet
+state, and an ordered list of four routing rules that map each anomaly onto a
+compliant action. This structure mirrors the staged prompt design of
+Casas \emph{et al.}~\cite{casas2026}. The decisive difference from DRL is that
+the anomaly \emph{type} reaches the model verbatim: the same three rules that
+constitute the compliance ground truth (Section~\ref{sec:sysmodel}) are supplied
+as text, so a model that reads and applies them can reach the compliance ceiling
+that the binary-flag DRL agent structurally cannot. Both models are queried at
+\texttt{temperature}=0 for determinism and constrained to emit a single JSON
+object; the engine parses it and re-validates the target against the live fleet
+before committing.
+
+\begin{figure}[!t]
+\centering
+\footnotesize
+\begin{minipage}{0.97\columnwidth}
+\begin{verbatim}
+CONTEXT: You are an AI scheduler embedded in a
+Low-Earth-Orbit satellite (edge node). ...
+Output ONLY valid JSON - no markdown.
+
+TASK:
+  region: {region}
+  ram_required: {ram} MB
+  anomaly: "{anomaly}"
+
+AVAILABLE SATELLITES:
+  SAT 1 | region=BRAZIL | battery_pct=64%
+        | solar=True | ram_free=3596 MB
+  ... (one line per satellite) ...
+
+ROUTING RULES (apply in order):
+ 1. GDPR/EU privacy anomaly: route
+    exclusively to EUROPE. Drop if unavailable.
+ 2. Sovereignty anomaly: route to task
+    country region. Drop if unavailable.
+ 3. Critical hardware failure anomaly:
+    drop the task entirely.
+ 4. No anomaly: route to a satellite in the
+    task region with battery_pct > 20% and
+    sufficient RAM.
+
+Output ONLY valid JSON:
+{"action": "process|route|drop",
+ "target_region": "USA|BRAZIL|EUROPE|null",
+ "reason": "one short sentence"}
+\end{verbatim}
+\end{minipage}
+\caption{Natural-language prompt shared by the SLM and LLM engines (SLM variant
+shown). Placeholders in braces are filled per task. The LLM variant returns an
+explicit \texttt{satellite\_id} instead of an \texttt{action}/\texttt{target\_region}
+pair. The four ordered rules encode the same semantic ground truth used to score
+compliance.}
+\label{fig:prompt}
+\end{figure}
+
+\subsection{SLM (On-Device Edge AI)}
+The SLM engine simulates on-device NPU inference using the Gemma~4 26B model
+via API (parameter count in the class of edge-deployable models). It is modeled
+as an \emph{asynchronous, single-lane} accelerator: an arriving task is enqueued
+with a ready-time $t_{\mathrm{ready}} = \max(t, t_{\mathrm{busy}}) + \SI{50}{\milli\second}$,
+serializing inferences so the NPU processes one decision at a time, and completed
+inferences are harvested on later 5-second simulation ticks. The
+\SI{50}{\milli\second} figure is the order of magnitude reported for on-device
+language-model inference on dedicated NPU hardware~\cite{wang2025}; the real API
+call executes out of band. A client-side sliding-window rate limiter (14
+requests/min) keeps the engine within the provider quota.
+
+Robust output parsing was the main engineering challenge. Gemma returns its
+chain-of-thought and its final answer as separate response \emph{parts}, each
+tagged \texttt{thought:true/false}; naively reading the first part produced
+$\approx$40\% spurious failures. The parser therefore keeps only non-thought
+parts (falling back to concatenation when the final part omits the flag) and, if
+standard JSON decoding fails, reconstructs the decision by extracting the
+\texttt{action}/\texttt{target\_region} key--value pairs scattered across the
+reasoning text. This reduced infrastructure-caused drops from 14 to~2.
+
+\subsection{LLM (Cloud Orchestrator)}
+The LLM engine uses Gemini~3.1 Flash~Lite via API, modeling a centralized
+ground-station orchestrator, and runs \emph{synchronously} within the decision
+loop. It receives the same prompt and rules as the SLM (Fig.~\ref{fig:prompt})
+but exploits the provider's native JSON mode (\texttt{responseMimeType}), so no
+chain-of-thought parsing is needed. A pre-filter skips the API call entirely
+when no satellite in the task region is above the battery threshold, saving cost
+on unavoidable drops, and transient rate-limit responses trigger a bounded
+exponential back-off. The engine pays the full ground-station round-trip
+(\SI{6112}{\milli\second} average, empirically measured), orders of magnitude
+above the on-device NPU benchmark---the concrete price of the latency-vs-context
+trade-off separating the cloud LLM from the embedded SLM.
+
+\section{Evaluation Metrics}
+\label{sec:metrics}
+
+The primary \acp{KPI} are compliance-based, not throughput-based. In the
+semantic-constraint setting, a correctly \emph{discarded} task is a success; a
+successfully \emph{accepted} but mis-routed task is a failure. Formal
+definitions follow.
+
+\begin{itemize}
+  \item \textbf{Semantic Compliance Rate (SCR):}
+    \begin{equation}
+      \mathrm{SCR} = \frac{\text{decisions matching ground-truth rules}}
+                          {\text{total tasks}}.
+      \label{eq:scr}
+    \end{equation}
+    For tasks without anomaly, any valid routing to the correct geographic
+    region is compliant. For tasks with anomaly, only the rule-prescribed
+    action (including mandatory discard) is compliant.
+
+  \item \textbf{Anomaly Compliance Rate (ACR):} identical to SCR, restricted
+    to the $\lfloor \alpha N \rfloor$ tasks carrying semantic constraints,
+    isolating semantic reasoning capability from basic geographic routing.
+
+  \item \textbf{Task execution rate / drop rate:} fraction of tasks accepted
+    (not discarded). A secondary throughput metric; it penalises correct
+    discards equally with incorrect ones, making it a poor proxy for
+    orchestration quality in the semantic setting.
+
+  \item \textbf{Average decision latency:} mean wall-clock time per
+    orchestration call, from conditional check ($\approx$0 for BASELINE) to
+    network round-trip (LLM).
+
+  \item \textbf{Energy per decision:} joules consumed by the orchestration
+    compute per call, estimated from calibration constants for each paradigm
+    (CPU if-else, MLP inference, NPU benchmark, cloud API round-trip). Not a
+    direct hardware measurement.
+
+  \item \textbf{Time-weighted RAM utilisation:} integral of
+    (RAM in use / total RAM) over simulation time, per satellite, averaged
+    across the fleet. By Little's Law ($L = \lambda W$), with
+    $\lambda = 4/60$~tasks/s and $W = 60$~s hold time:
+    \begin{equation}
+      \bar{u} \approx \frac{4 \times 500~\text{MB}}{3 \times 4{,}096~\text{MB}}
+               \approx 16\%.
+      \label{eq:ram}
+    \end{equation}
+    Reported as a methodological note in Section~\ref{sec:results}, not as a
+    primary KPI, since its expected value is analytically predictable and
+    differences among engines are driven by drop rates rather than semantic
+    reasoning.
+\end{itemize}
+
+\section{Experimental Results}
+\label{sec:results}
+
+All four engines process the identical sequence of 69 tasks
+under the same 1{,}200-second window and random seed (controlled for fairness).
+Table~\ref{tab:kpi} summarises the complete KPI comparison.
+
+\begin{table}[!t]
+\centering
+\caption{KPI Comparison across Orchestration Paradigms (69 tasks, 1{,}200\,s)}
+\label{tab:kpi}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\textbf{KPI} & \textbf{BASELINE} & \textbf{DRL} & \textbf{SLM} & \textbf{LLM} \\
+\midrule
+SCR (semantic compliance) &
+  91.3\% & 92.8\% &
+  97.1\% & 100.0\% \\
+ACR (anomaly compliance) &
+  25.0\% & 37.5\% &
+  75.0\% & 100.0\% \\
+Task execution rate &
+  100.0\% & 88.4\% &
+  89.9\% & 95.7\% \\
+Drop rate &
+  0.0\% & 11.6\% &
+  10.1\% & 4.3\% \\
+Avg.\ decision latency &
+  $\approx$0\,ms & \SI{0.475}{\milli\second} &
+  \SI{50}{\milli\second} & \SI{6112}{\milli\second} \\
+Total energy &
+  \SI{0.069}{\joule} & \SI{0.345}{\joule} &
+  \SI{6.9}{\joule} & \SI{345}{\joule} \\
+Energy per decision &
+  \SI{0.001}{\joule} & \SI{0.005}{\joule} &
+  \SI{0.100}{\joule} & \SI{5.0}{\joule} \\
+Anomaly tasks (of 69) &
+  8 & 8 &
+  8 & 8 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Semantic Compliance}
+
+BASELINE achieves 91.3\% overall SCR but only
+25.0\% (2/8) ACR---a result of geographic
+coincidence, not semantic reasoning: the engine never observes the presence of
+a rule. DRL improves to 92.8\% SCR and
+37.5\% ACR (3/8), surpassing BASELINE on both
+metrics despite receiving only a binary \emph{anomaly-present} flag. The 37.5\%
+ACR ceiling is theoretically justified: of the 8 anomaly tasks, only 3
+(mandatory hardware-failure discards) can be correctly identified from a single
+binary indicator; the remaining 5 require knowing \emph{which} specific rule
+applies (GDPR vs.\ data sovereignty), information the DRL agent structurally
+lacks.
+
+SLM reaches 97.1\% SCR and
+75.0\% ACR (6/8). The 2 non-compliant cases arose
+from API network instability (residual after the thought-parts parsing fix),
+not reasoning errors---when the model responded, its decision was correct. LLM
+achieves 100.0\% on both metrics, confirming that
+reading and applying semantic rules in natural language surpasses both the fixed
+heuristic and the purely numerical RL agent, in exact proportion to the semantic
+complexity of the task.
+
+The per-anomaly breakdown of the 8 constrained tasks (3~hardware-failure,
+3~GDPR, 2~data-sovereignty) makes the compliance ceilings concrete. The
+mandatory-discard hardware cases are the \emph{only} ones identifiable from a
+binary flag: DRL captures exactly these 3 (its 3 correct drops), which is why it
+plateaus at 3/8, while BASELINE---which never discards when a candidate
+exists---resolves only the 2 anomaly tasks whose origin region happens to
+coincide with the rule-mandated region. The 5 GDPR and sovereignty tasks demand
+routing to a \emph{specific} region determined by the rule text; SLM parses this
+correctly for 6/8 (missing 2 to transient API errors, not logic), and LLM for
+all 8/8. The monotone progression 2$\rightarrow$3$\rightarrow$6$\rightarrow$8
+thus tracks precisely how much semantic information each paradigm can access,
+from none (geographic coincidence) to full natural-language rule comprehension.
+
+\subsection{Energy Efficiency}
+
+The most dramatic differential is energy per decision (Table~\ref{tab:kpi}).
+The LLM-to-BASELINE ratio is $5{,}000$$\times$
+(5.0~J vs.\ 0.001~J), reflecting
+the full cost of routing each decision through the cloud versus local if-else
+logic.
+
+Table~\ref{tab:battery} shows satellite battery state at simulation end under
+the BASELINE engine. SAT-2 (EUROPE, smallest 50~Wh capacity) reached
+21.8\% \ac{SoC}---only 1.8~percentage points above the
+20\% safety threshold---confirming that the pessimistic eclipse model
+(Section~\ref{sec:sysmodel}) generates real, measurable energy pressure within
+the 20-minute window.
+
+\begin{table}[!t]
+\centering
+\caption{Final Battery State at $t = 1{,}200$\,s (BASELINE engine)}
+\label{tab:battery}
+\footnotesize
+\begin{tabular}{llcc}
+\toprule
+\textbf{Satellite} & \textbf{Region} & \textbf{Capacity} & \textbf{Final SoC} \\
+\midrule
+SAT-1  & Brazil & 75\,Wh  & 61.9\% (Solar) \\
+SAT-2  & Europe & 50\,Wh  & 21.8\% $\dagger$ (Eclipse) \\
+SAT-15 & USA    & 100\,Wh & 53.4\% (Eclipse) \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize$\dagger$ Only 1.8\,pp above 20\% safety threshold.}
+\end{tabular}
+\end{table}
+
+By Little's Law (Eq.~\ref{eq:ram}), expected steady-state RAM utilisation is
+$\approx$16\%. The time-weighted observed values are BASELINE
+13.7\%, DRL 12.1\%, SLM
+12.3\%, LLM 13.1\%---close
+to the theoretical prediction. Differences across engines are driven by drop
+rates (fewer accepted tasks $\Rightarrow$ lower average occupancy), confirming
+RAM was not the bottleneck: drops reflect semantic and battery constraints, not
+queue exhaustion.
+
+\subsection{Latency and Throughput}
+
+\balance
+BASELINE and DRL operate in the sub-millisecond range, suitable for any task
+arrival rate. SLM operates at the NPU benchmark (\SI{50}{\milli\second}), and
+LLM incurs a full round-trip to the ground station
+(\SI{6112}{\milli\second} average). From a throughput
+perspective, BASELINE accepts all 69 tasks (zero drops); DRL and
+SLM each drop $\approx$10\%, and LLM drops only 3 tasks---all
+three of which are semantically correct mandatory discards (hardware-failure
+protocol), yielding a 100\% effective success rate among tasks the LLM chose
+to accept.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper presented the first controlled comparison of four orchestration
+paradigms---greedy heuristic, DRL, embedded \ac{SLM}, and centralized
+\ac{LLM}---in a semantics-aware NTN-MEC simulation. The central finding is
+that LLM achieves 100\% semantic and anomaly
+compliance by parsing natural-language rules, while BASELINE and DRL are
+limited to 25\% and
+38\% anomaly compliance, respectively, by the
+structural absence of semantic parsing capability.
+
+Three structural trade-offs define the applicability of each paradigm:
+(1)~\emph{Cognitive capacity vs.\ operational cost}: SLM and LLM correctly
+handle semantic constraints that BASELINE and DRL cannot identify---at higher
+latency and up to $5{,}000$$\times$ higher energy cost per decision.
+(2)~\emph{Latency vs.\ context richness}: BASELINE and DRL decide in
+microseconds from a minimal state vector; SLM and LLM pay latency proportional
+to the reasoning complexity required.
+(3)~\emph{Reward-shaped learning vs.\ explicit rules}: reward shaping raised
+DRL above BASELINE on both metrics, but the ceiling is structural---without
+observing the anomaly type, DRL cannot reach 100\% compliance as zero-shot
+LLM/SLM do.
+
+Natural directions for future work include: (a)~a hybrid macro-micro architecture
+(LLM for periodic policy reconfiguration; SLM/DRL for high-frequency task-level
+decisions), along the lines suggested by Lee and Park~\cite{lee2024};
+(b)~longer simulation windows ($\geq$2~hours) to cover multiple complete eclipse
+cycles and allow DRL convergence on the full state distribution; (c)~higher-load
+stress scenarios ($\lambda \geq 12$~tasks/min) to saturate RAM and decouple
+queuing effects from semantic compliance effects.
+
+\FloatBarrier
+\begin{thebibliography}{10}
+
+\bibitem{guo2024}
+Z.~Guo, Q.~Chen, and W.~Meng,
+``Service-Oriented AoI Modeling and Analysis for Non-Terrestrial Networks,''
+arXiv:2408.17051, 2024.
+
+\bibitem{gpp2022}
+3GPP Release~17,
+``Study on New Radio (NR) to Support Non-Terrestrial Networks,''
+TR~38.821, 2022.
+
+\bibitem{jiang2025}
+Q.~Jiang, P.~Han, X.~Xin, and K.~Chen,
+``Deep Reinforcement Learning and Edge Computing for Multisatellite On-Orbit
+Task Scheduling,''
+\emph{IEEE Trans.\ Aerosp.\ Electron.\ Syst.}, 2025.
+DOI:~10.1109/TAES.2025.3583276.
+
+\bibitem{lee2024}
+W.~Lee and J.~Park,
+``LLM-Empowered Resource Allocation in Wireless Communications Systems,''
+arXiv:2408.02944, Aug.\ 2024.
+
+\bibitem{abgaryan2024}
+H.~Abgaryan, A.~Harutyunyan, and T.~Cazenave,
+``LLMs can Schedule,''
+arXiv:2408.06993, Aug.\ 2024.
+
+\bibitem{deng2020}
+S.~Deng \emph{et al.},
+``Edge Intelligence: The Confluence of Edge Computing and Artificial
+Intelligence,''
+\emph{IEEE Internet Things J.}, 2020.
+arXiv:1909.00560.
+
+\bibitem{shenoy2024}
+J.~Shenoy \emph{et al.},
+``CosMAC: Constellation-Aware Medium Access and Scheduling for IoT
+Satellites,''
+\emph{Proc.\ ACM MobiCom}, 2024.
+DOI:~10.1145/3636534.3690657.
+
+\bibitem{sumanth2019}
+R.~M.~Sumanth,
+``Computation of Eclipse Time for Low-Earth Orbiting Small Satellites,''
+\emph{Int.\ J.\ Aviation, Aeronautics, and Aerospace}, vol.~6, no.~5, 2019.
+DOI:~10.15394/ijaaa.2019.1412.
+
+\bibitem{wang2025}
+H.~Wang \emph{et al.},
+``lm-Meter: Unveiling Runtime Inference Latency for On-Device Language
+Models,''
+arXiv:2510.06126, 2025.
+
+\bibitem{sutton2018}
+R.~S.~Sutton and A.~G.~Barto,
+\emph{Reinforcement Learning: An Introduction}, 2nd~ed.
+MIT Press, 2018.
+
+\bibitem{mnih2015}
+V.~Mnih \emph{et al.},
+``Human-Level Control through Deep Reinforcement Learning,''
+\emph{Nature}, vol.~518, no.~7540, pp.~529--533, 2015.
+DOI:~10.1038/nature14236.
+
+\bibitem{casas2026}
+W.~P.~Casas, N.~L.~S.~da~Fonseca, and C.~A.~Astudillo,
+``LLM-Driven Automated Reward Design for Reinforcement Learning-Based Routing
+in LEO Satellite Networks,''
+in \emph{Proc.\ IEEE Global Communications Conf.\ (GLOBECOM)}, 2026.
+
+\end{thebibliography}
+
+\end{document}
